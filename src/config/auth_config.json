@@ -1,0 +1,23 @@
+{
+  "domain": "easefica.eu.auth0.com",
+  "clientID": "j_2gNtjBSmFX7tyre5IPWLuZTf1G-OqV",
+  "options" : {
+      "auth" : {
+        "redirect":false,  
+        "sso":true,
+        "responseType": "token id_token"
+      },
+      "avatar": null,
+      "autoclose": true,
+      "allowSignUp" : false,
+      "theme": {
+        "logo": "/img/logo-white.png",
+        "primaryColor": "#f26897"
+      },
+      "languageDictionary": {
+        "emailInputPlaceholder": "something@youremail.com",
+        "title": "Welcome, please login..."
+      }
+    },
+  "apiKey" : "cxdeg6zcsCxM6qmWmF6rp3cHF6ZBr8UwCz6UkDf78dcdMA9PMHm"  
+}

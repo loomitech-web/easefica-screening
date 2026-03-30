@@ -14,6 +14,9 @@ export default defineConfig({
     vuetify({ autoImport: true }),
     vueDevTools(),
   ],
+  server: {
+    port: 9001
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
