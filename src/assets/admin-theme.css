@@ -1,0 +1,77 @@
+:root {
+  --ef-primary: #0a7cb9;
+  --ef-secondary: #1b5a7d;
+  --ef-accent: #f26897;
+  --ef-surface: rgba(255, 255, 255, 0.96);
+  --ef-border: #e6e6e6;
+  --ef-text-soft: #5d6b78;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+}
+
+body {
+  background:
+    linear-gradient(rgba(10, 124, 185, 0.78), rgba(10, 124, 185, 0.78)),
+    radial-gradient(circle at top right, rgba(242, 104, 151, 0.18), transparent 28%),
+    linear-gradient(180deg, #0d7ab7 0%, #0b5f8e 100%);
+  background-attachment: fixed;
+  color: #173042;
+}
+
+.v-application {
+  background: transparent !important;
+  font-family: Roboto, sans-serif;
+}
+
+.v-card {
+  border-radius: 8px !important;
+}
+
+.screen-page {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.screen-page__title {
+  color: #fff;
+  font-weight: 400;
+  letter-spacing: 0.2px;
+}
+
+.screen-panel {
+  background: var(--ef-surface);
+  border: 1px solid rgba(230, 230, 230, 0.9);
+  box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.1), 0 5px 8px rgba(0, 0, 0, 0.05), 0 1px 14px rgba(0, 0, 0, 0.01) !important;
+}
+
+.screen-panel__title {
+  color: var(--ef-secondary);
+  font-weight: 500;
+}
+
+.screen-page .text-caption {
+  color: var(--ef-text-soft);
+  letter-spacing: 0.2px;
+}
+
+.screen-table thead th {
+  color: var(--ef-secondary);
+  font-weight: 500;
+}
+
+.screen-toolbar {
+  margin-bottom: 12px;
+}
+
+.field-control .v-field {
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.field-control .v-field--focused {
+  box-shadow: 0 0 0 2px rgba(242, 104, 151, 0.12);
+}

@@ -5,7 +5,14 @@ import App from '../App.vue'
 
 describe('App', () => {
   it('mounts renders properly', () => {
-    const wrapper = mount(App)
-    expect(wrapper.text()).toContain('You did it!')
+    const wrapper = mount(App, {
+      global: {
+        stubs: {
+          VApp: { template: '<div><slot /></div>' },
+          RouterView: true,
+        },
+      },
+    })
+    expect(wrapper.findComponent({ name: 'RouterView' }).exists()).toBe(true)
   })
 })

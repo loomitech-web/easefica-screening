@@ -2,6 +2,8 @@ import Auth0Lock from 'auth0-lock';
 import axios from 'axios';
 import { useAuthStore } from '../stores/auth';
 
+let authLockInstance = null;
+
 class AuthLockService {
   constructor({ router, pinia, config }) {
     this.router = router;
@@ -39,7 +41,7 @@ class AuthLockService {
         });
 
         this.createClient();
-        this.router.push({ name: 'home' });
+        this.router.push({ name: 'dashboard' });
       });
     });
 
@@ -99,7 +101,12 @@ export function installAuthLock(app, { router, pinia, config }) {
     pinia,
     config,
   });
+  authLockInstance = service;
 
   app.config.globalProperties.$authLock = service;
   app.provide('authLock', service);
+}
+
+export function getAuthLockService() {
+  return authLockInstance;
 }
