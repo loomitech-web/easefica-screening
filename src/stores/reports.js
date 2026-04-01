@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
-import { fetchCostReport, fetchMatchReport } from '../services/screening-api';
+import { fetchCostReport, fetchMatchReport } from '../services/server';
 
 export const useReportsStore = defineStore('reports', () => {
   const activeMatchReport = ref(null);

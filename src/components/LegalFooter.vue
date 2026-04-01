@@ -3,10 +3,10 @@
     <v-row style="">
       <v-col cols="12" :xl=12 :lg=12 :md=12 :sm=12 :xs=12 style="">
 
-        <v-row justify="center" dense style="padding:0px;margin:0px">
+        <v-row justify="center" compact style="padding:0px;margin:0px">
           <h4 class="text-align-center">eas-e fica (Pty) Ltd. © Copyright 2020. All Rights Reserved.</h4>
         </v-row>
-        <v-row justify="center" dense style="padding:0px;margin:0px">
+        <v-row justify="center" compact style="padding:0px;margin:0px">
           <h4>Terms of Use | Privacy Policy</h4>
         </v-row>
 

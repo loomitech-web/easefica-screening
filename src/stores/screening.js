@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
-import { fetchDashboardSummary, fetchScreeningHistory } from '../services/screening-api';
+import { fetchDashboardSummary, fetchScreeningHistory } from '../services/server';
 
 export const useScreeningStore = defineStore('screening', () => {
   const summary = ref({
