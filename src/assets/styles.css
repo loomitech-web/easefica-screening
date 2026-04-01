@@ -1,0 +1,33 @@
+:root {
+  --ef-primary: #0a7cb9;
+  --ef-secondary: #1b5a7d;
+  --ef-accent: #f26897;
+  --ef-surface: rgba(255, 255, 255, 0.96);
+  --ef-border: #e6e6e6;
+  --ef-text-soft: #5d6b78;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+}
+
+body {
+  background:
+    linear-gradient(rgba(10, 124, 185, 0.78), rgba(10, 124, 185, 0.78)),
+    radial-gradient(circle at top right, rgba(242, 104, 151, 0.18), transparent 28%),
+    linear-gradient(180deg, #0d7ab7 0%, #0b5f8e 100%);
+  background-attachment: fixed;
+  color: #173042;
+}
+
+.v-application {
+  background: transparent !important;
+  font-family: Roboto, sans-serif;
+}
+
+.v-card {
+  border-radius: 8px !important;
+}
+

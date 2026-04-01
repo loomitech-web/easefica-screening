@@ -6,17 +6,22 @@ export default createVuetify({
     defaultTheme: 'light',
     themes: {
       light: {
-        colors: {
-          primary: '#0a7cb9',
-          secondary: '#1b5a7d',
-          accent: '#f26897',
-          error: '#ff5252',
-          info: '#2196f3',
-          success: '#4caf50',
-          warning: '#ffc107',
-          surface: '#ffffff',
-          background: '#f4f9fc',
-        },
+        primary: '#0a7cb9',
+        secondary: '#1b5a7d',
+        accent: '#f26897',
+        error: '#FF5252',
+        info: '#2196F3',
+        success: '#4CAF50',
+        warning: '#FFC107'
+      },
+      dark: {
+        primary: '#0a7cb9',
+        secondary: '#1b5a7d',
+        accent: '#f26897',
+        error: '#FF5252',
+        info: '#2196F3',
+        success: '#4CAF50',
+        warning: '#FFC107'
       },
     },
   },
