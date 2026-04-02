@@ -1,115 +1,111 @@
+import axios from 'axios';
 import { getAuthLockService } from './auth-lock';
-import {
-  getMockCostReport,
-  getMockDashboardSummary,
-  getMockMatchReport,
-  getMockScreeningHistory,
-} from './screening-mock-data';
 
-function shouldUseMock(resource) {
-  const resourceFlag = import.meta.env[`VITE_SCREENING_USE_MOCK_${resource.toUpperCase()}`];
-  const globalFlag = import.meta.env.VITE_SCREENING_USE_MOCK_ALL;
-  if (resourceFlag !== undefined) return resourceFlag === 'true';
-  return globalFlag === 'true';
+function getBaseUrl() {
+  const host = window.location.hostname;
+
+  if (host === 'localhost' || host === '127.0.0.1') {
+    console.log("URL: http://localhost:4601");
+    return 'http://localhost:4601';
+  }
+
+  console.log("URL: https://odata42s.easefica.co.za");
+  return 'https://odata42s.easefica.co.za';
 }
 
 function getClient() {
   const authLock = getAuthLockService();
-  if (!authLock?.isAuthorised()) return null;
-  return authLock.createClient();
+  const headers = authLock?.isAuthorised() ? authLock.headers() : {};
+  return axios.create({
+    baseURL: getBaseUrl(),
+    timeout: 10000,
+    headers,
+  });
 }
 
-function mapScreeningItem(entry) {
-  return {
-    id: entry.id || entry.ID || entry.screeningId,
-    subjectName: entry.subjectName || entry.Name || entry.subject || 'Unknown',
-    referenceId: entry.referenceId || entry.ReferenceId || entry.refId || '-',
-    submittedAt: entry.submittedAt || entry.CreatedAt || entry.createdAt || new Date().toISOString(),
-    status: entry.status || entry.Result || 'CLEAR',
-    totalMatches: entry.totalMatches || entry.MatchCount || 0,
-    screenedLists: entry.screenedLists || entry.Lists || [],
-    cost: Number(entry.cost || entry.Cost || 0),
-  };
+// function mapScreeningItem(entry) {
+//   return {
+//     id: entry.id || entry.ID || entry.screeningId,
+//     subjectName: entry.subjectName || entry.Name || entry.subject || 'Unknown',
+//     referenceId: entry.referenceId || entry.ReferenceId || entry.refId || '-',
+//     submittedAt: entry.submittedAt || entry.CreatedAt || entry.createdAt || new Date().toISOString(),
+//     status: entry.status || entry.Result || 'CLEAR',
+//     totalMatches: entry.totalMatches || entry.MatchCount || 0,
+//     screenedLists: entry.screenedLists || entry.Lists || [],
+//     cost: Number(entry.cost || entry.Cost || 0),
+//   };
+// }
+
+async function tryRequest(executor) {
+  const client = getClient();
+  return await executor(client);
 }
 
-async function tryRequest(resource, executor, fallback) {
-  if (shouldUseMock(resource)) return fallback();
-  try {
-    const client = getClient();
-    if (!client) return fallback();
-    return await executor(client);
-  } catch {
-    return fallback();
-  }
+export async function fetchDashboardSummary(aiId) {
+  return tryRequest(async (client) => {
+    if (!aiId) {
+      throw new Error('AI ID is required to load dashboard summary.');
+    }
+
+    const statsResponse = await client.get(`/easefica-screening/screening/screening/getDashboardScreeningStats`, {
+      params: { aiId },
+    });
+    return statsResponse.data;
+  });
 }
 
-export async function fetchDashboardSummary() {
-  return tryRequest(
-    'dashboard',
-    async (client) => {
-      const [summaryResponse, recentResponse] = await Promise.all([
-        client.get('/ScreeningDashboardSummary'),
-        client.get('/Screenings', { params: { $top: 5, $orderby: 'submittedAt desc' } }),
-      ]);
-      return {
-        total: summaryResponse.data.total || 0,
-        matchFound: summaryResponse.data.matchFound || 0,
-        clear: summaryResponse.data.clear || 0,
-        recent: (recentResponse.data.value || []).map(mapScreeningItem),
-      };
-    },
-    () => getMockDashboardSummary(),
-  );
-}
+export async function fetchScreeningHistory(params = {}) {
+  return tryRequest(async (client) => {
+    if (!params.aiId) {
+      throw new Error('AI ID is required to load screening history.');
+    }
 
-export async function fetchScreeningHistory(params) {
-  return tryRequest(
-    'history',
-    async (client) => {
-      const page = Number(params.page || 1);
-      const pageSize = Number(params.pageSize || 10);
-      const skip = (page - 1) * pageSize;
-      const filter = params.search
-        ? `contains(subjectName,'${params.search.replace(/'/g, "''")}')`
-        : undefined;
+    const page = Number(params.page || 1);
+    const pageSize = Number(params.pageSize || 10);
+    const response = await client.get('/easefica-screening/screening/screening/getScreeningHistory', {
+      params: {
+        aiId: params.aiId,
+        ...(params.startDate ? { startDate: params.startDate } : {}),
+        ...(params.endDate ? { endDate: params.endDate } : {}),
+        page: page,
+        pageSize: pageSize,
+      },
+    });
 
-      const response = await client.get('/Screenings', {
-        params: {
-          $top: pageSize,
-          $skip: skip,
-          $count: true,
-          $orderby: 'submittedAt desc',
-          ...(filter ? { $filter: filter } : {}),
-        },
-      });
-
-      return {
-        items: (response.data.value || []).map(mapScreeningItem),
-        total: response.data['@odata.count'] || 0,
-      };
-    },
-    () => getMockScreeningHistory(params),
-  );
+    return response.data;
+  });
 }
 
 export async function fetchMatchReport(id) {
-  return tryRequest(
-    'matchreport',
-    async (client) => {
-      const response = await client.get(`/MatchReports(${id})`);
-      return response.data;
-    },
-    () => getMockMatchReport(id),
-  );
+  return tryRequest(async (client) => {
+    const response = await client.get('/easefica-screening/screening/screening/getScreeningResults', {
+      params: { screeningId: id },
+    });
+    return response.data;
+  });
 }
 
-export async function fetchCostReport() {
-  return tryRequest(
-    'costreport',
-    async (client) => {
-      const response = await client.get('/ScreeningCostReport');
-      return response.data;
-    },
-    () => getMockCostReport(),
-  );
+export async function fetchCostReport(aiId, isScreening = true) {
+  return tryRequest(async (client) => {
+    if (!aiId) {
+      throw new Error('AI ID is required to load cost report.');
+    }
+
+    const response = await client.post('/easefica-screening/credit/calc/calcCost', {
+      aiId,
+      isScreening,
+    });
+
+    const cost = Number(response.data?.cost || 0);
+    const totalScreenings = Number(response.data?.numberOfScreenings || 0);
+
+    return {
+      totalScreenings,
+      totalCost: cost,
+      averageCost: totalScreenings > 0 ? cost / totalScreenings : 0,
+      effectiveDataSubjects: Number(response.data?.effectiveDataSubjects || 0),
+      previousMonth: response.data?.previousMonth || null,
+      thisMonth: response.data?.thisMonth || null,
+    };
+  });
 }

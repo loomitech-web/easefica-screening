@@ -1,7 +1,7 @@
 <template>
     <v-card class="dynamic-table-panel">
         <div v-if="filterControls" class="dynamic-table-panel__toolbar">
-            <v-row class="align-center" dense>
+            <v-row class="align-center" compact>
                 <v-col v-if="filterControls.search" cols="12" md="4">
                     <v-text-field v-model="search" class="dynamic-table-filter" label="Search subjects..."
                         prepend-inner-icon="mdi-magnify" variant="outlined" hide-details density="compact" />
@@ -20,13 +20,17 @@
             </v-row>
         </div>
 
-        <v-data-table :headers="headers" :items="filteredContent" :search="search" class="dynamic-table" hover>
+        <v-data-table-server :headers="headers" :items="filteredContent" :search="search" class="dynamic-table" hover
+            :items-per-page="pageSize" :page="page" :items-per-page-text="`Items per page`"
+            :page-text="`Page ${page} of ${pagination.pageCount}`" :items-length="totalCount"
+            :items-per-page-options="[10, 25, 50, 100]" @update:page="onPageChange"
+            @update:items-per-page="onItemsPerPageChange">
             <template v-for="header in headers" :key="header.key" v-slot:[`item.${header.key}`]="{ value, item }">
                 <slot :name="`item.${header.key}`" :value="value" :item="item">
                     {{ value }}
                 </slot>
             </template>
-        </v-data-table>
+        </v-data-table-server>
     </v-card>
 </template>
 
@@ -44,13 +48,43 @@ const props = defineProps({
             categoryFilter: false,
             categoryFilters: []
         })
-    }
+    },
+    totalCount: { type: Number, required: true },
+    page: { type: Number, required: true },
+    pageSize: { type: Number, required: true },
 })
+
+const emit = defineEmits(['update:page', 'update:pageSize'])
+
+function onPageChange(value) {
+    console.log('DynamicTable | page changed', {
+        from: props.page,
+        to: value,
+        totalCount: props.totalCount,
+        pageSize: props.pageSize,
+    })
+    emit('update:page', value)
+}
+
+function onItemsPerPageChange(value) {
+    console.log('DynamicTable | page size changed', {
+        page: props.page,
+        from: props.pageSize,
+        to: value,
+        totalCount: props.totalCount,
+    })
+    emit('update:pageSize', value)
+}
 
 const search = ref('')
 const dateRange = ref(null)
 const selectedCategory = ref(null)
-
+const pagination = computed(() => ({
+    page: props.page,
+    pageSize: props.pageSize,
+    total: props.totalCount,
+    pageCount: Math.max(1, Math.ceil(props.totalCount / props.pageSize)),
+}))
 // Advanced Filtering Logic
 const filteredContent = computed(() => {
     let data = props.content
@@ -59,7 +93,14 @@ const filteredContent = computed(() => {
         data = data.filter(item => item.category === selectedCategory.value)
     }
 
-    // Date filtering logic would go here based on your specific 'date' key
+    console.log('DynamicTable | received props', {
+        contentLength: props.content?.length || 0,
+        filteredLength: data.length,
+        totalCount: props.totalCount,
+        page: props.page,
+        pageSize: props.pageSize,
+        firstItem: data[0] || null,
+    })
 
     return data
 })

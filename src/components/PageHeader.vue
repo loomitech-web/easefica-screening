@@ -7,11 +7,26 @@ defineProps({
     type: String,
     required: true,
   },
+  iconSrc: {
+    type: String,
+    required: false,
+    default: '',
+  },
+  icon: {
+    type: String,
+    required: false,
+    default: 'mdi-shield-check',
+  },
 });
 </script>
 
 <template>
   <div class="page-header">
+    <div class="page-icon-container">
+      <img v-if="iconSrc" :src="iconSrc" alt="" class="page-icon-image">
+      <i v-else-if="icon.startsWith('fi ')" :class="icon" class="page-icon" aria-hidden="true" />
+      <v-icon v-else :icon="icon" size="48" />
+    </div>
     <div class="logo-container">
       <img :src="logoBlue" alt="Easefica Logo" class="logo">
     </div>
@@ -24,6 +39,27 @@ defineProps({
 <style scoped>
 .page-header {
   margin-bottom: 12px;
+}
+
+.page-icon-container {
+  display: inline-block;
+  justify-content: left;
+  align-items: center;
+  border: 1px solid var(--ef-border);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.page-icon {
+  font-size: 48px;
+  line-height: 1;
+  color: var(--ef-secondary);
+}
+
+.page-icon-image {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
 }
 
 .pageSectionHeaderContainer {

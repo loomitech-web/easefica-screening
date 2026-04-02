@@ -4,10 +4,8 @@ import { fetchDashboardSummary, fetchScreeningHistory } from '../services/server
 
 export const useScreeningStore = defineStore('screening', () => {
   const summary = ref({
-    total: 0,
-    matchFound: 0,
-    clear: 0,
-    recent: [],
+    totalNumberOfScreenings: 0,
+    latestScreening: null,
   });
   const history = ref([]);
   const query = ref({
@@ -26,12 +24,23 @@ export const useScreeningStore = defineStore('screening', () => {
     pageCount: Math.max(1, Math.ceil(total.value / query.value.pageSize)),
   }));
 
-  async function loadDashboard() {
+  async function loadDashboard(aiId) {
     isLoading.value = true;
     error.value = '';
+    console.log('Loading dashboard for AI ID:', aiId);
     try {
-      summary.value = await fetchDashboardSummary();
+      summary.value = await fetchDashboardSummary(aiId);
+      const historyResponse = await fetchScreeningHistory({
+        aiId,
+        page: query.value.page,
+        pageSize: query.value.pageSize,
+      });
+      history.value = historyResponse.history || [];
+      total.value = historyResponse.count || history.value.length;
+      console.log('Dashboard loaded:', summary.value);
+      console.log('History loaded:', history.value);
     } catch (err) {
+      console.error('Error loading dashboard:', err);
       error.value = err?.message || 'Could not load dashboard data.';
     } finally {
       isLoading.value = false;
@@ -47,8 +56,8 @@ export const useScreeningStore = defineStore('screening', () => {
     error.value = '';
     try {
       const response = await fetchScreeningHistory(query.value);
-      history.value = response.items;
-      total.value = response.total;
+      history.value = response.history || [];
+      total.value = response.count || history.value.length;
     } catch (err) {
       error.value = err?.message || 'Could not load screening history.';
     } finally {
