@@ -7,12 +7,14 @@ import logoWhite from '../assets/logo-white.png';
 import { useAuthStore } from '../stores/auth';
 import { useScreeningStore } from '../stores/screening';
 import { useReportsStore } from '../stores/reports';
+import { useUserStore } from '../stores/user';
 
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
 const screeningStore = useScreeningStore();
 const reportsStore = useReportsStore();
+const userStore = useUserStore();
 const authLock = inject('authLock', null);
 const logoSrc = logoWhite;
 
@@ -22,7 +24,6 @@ const drawer = ref(true);
 const topLevelItems = [
   { title: 'Dashboard', icon: 'mdi-view-dashboard-outline', to: { name: 'dashboard' } },
   { title: 'Manage Data Subjects', icon: 'mdi-account-multiple-outline', to: { name: 'manage-data-subjects' } },
-  { title: 'Screening Results', icon: 'mdi-file-document-outline', to: { name: 'screening-results' } },
 ];
 
 const reportItems = [
@@ -34,11 +35,22 @@ const reportItems = [
 const userDisplayName = computed(
   () => profile.value?.nickname || profile.value?.email || 'Authenticated User',
 );
+
 const companyDisplay = computed(() => profile.value?.company || 'Easefica Screening');
 const roleDisplay = computed(() => profile.value?.role || 'Screening Analyst');
 const showBusy = computed(() => screeningStore.isLoading || reportsStore.isLoading);
 
 const reportsOpen = ref(route.path.startsWith('/reports'));
+
+watch(
+  () => profile.value,
+  (value) => {
+    if (value) {
+      userStore.hydrateFromOData();
+    }
+  },
+  { immediate: true },
+);
 
 watch(
   () => route.path,
@@ -64,8 +76,8 @@ function navigate(to) {
 
 <template>
   <v-layout class="app-shell">
-    <v-navigation-drawer v-model="drawer" class="shell-drawer main-layout-drawer" style="opacity:0.9" color="primary"
-      width="224" rail-width="72" rail expand-on-hover permanent>
+    <v-navigation-drawer app v-model="drawer" class="shell-drawer main-layout-drawer" style="opacity:0.9"
+      color="primary" width="224" rail-width="72" rail expand-on-hover permanent>
 
       <div style="height:64px; width:224px;padding:0px 16px">
         <v-row>
@@ -93,21 +105,23 @@ function navigate(to) {
       </v-list>
     </v-navigation-drawer>
 
-    <v-app-bar color="transparent" flat class="shell-header">
+    <v-app-bar color="transparent" flat class="shell-header" app>
       <v-toolbar-title>
-        <v-row>
-          <v-col>
+        <v-row align="center" no-gutters>
+          <v-col cols="auto">
             <v-img class="shrink" contain :src="logoSrc" transition="scale-transition" width="120" />
+          </v-col>
+
+          <v-col cols="auto">
+            <v-card class="info-card info-card--accent" elevation="10">
+              <div class="info-card__inner">
+                <v-icon icon="mdi-laptop" />
+                <div class="role-copy">{{ companyDisplay }}<br>{{ roleDisplay }}</div>
+              </div>
+            </v-card>
           </v-col>
         </v-row>
       </v-toolbar-title>
-
-      <v-card class="info-card info-card--accent" elevation="10">
-        <div class="info-card__inner">
-          <v-icon icon="mdi-laptop" />
-          <div class="role-copy">{{ companyDisplay }}<br>{{ roleDisplay }}</div>
-        </div>
-      </v-card>
 
       <v-spacer />
 
@@ -124,27 +138,61 @@ function navigate(to) {
       <router-view />
       <v-progress-circular v-if="showBusy" class="global-loader" color="accent" indeterminate />
     </v-main>
-  </v-layout>
 
-  <footer class="app-footer">
-    <LegalFooter />
-  </footer>
+    <v-footer app class="app-footer">
+      <LegalFooter />
+    </v-footer>
+  </v-layout>
 
 </template>
 
 <style scoped>
 .app-shell {
-  min-height: calc(100vh - 56px);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .shell-header {
   color: #fff;
   padding-inline: 8px 32px;
+  height: 64px;
+  min-height: 64px;
+}
+
+.shell-header :deep(.v-toolbar__content) {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  align-items: flex-start !important;
+}
+
+/* Vuetify v-app-bar wrapper content */
+.shell-header :deep(.v-app-bar__content) {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  align-items: flex-start !important;
+}
+
+.shell-header :deep(.v-toolbar__title),
+.shell-header :deep(.v-toolbar-title) {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin: 0 !important;
 }
 
 .content-wrapper {
   position: relative;
   padding: 24px 16px;
+  flex: 1 1 auto;
+  overflow-x: hidden;
+  z-index: 1;
+  background: transparent;
+}
+
+.content-wrapper :deep(.v-main__wrap) {
+  height: 100%;
+  overflow-y: auto;
 }
 
 .global-loader {
@@ -156,13 +204,18 @@ function navigate(to) {
 }
 
 .app-footer {
-  position: sticky;
-  bottom: 0;
+  flex: 0 0 auto;
   background: rgba(10, 124, 185, 0.67);
+  z-index: 10;
+  padding: 0;
 }
 
 .shell-nav-item--child {
   margin-left: 0;
+}
+
+.shell-drawer {
+  z-index: 20;
 }
 
 .shell-nav-group :deep(.v-list-group__items) {
@@ -217,14 +270,14 @@ function navigate(to) {
 }
 
 .info-card {
-  margin-top: -16px;
+  margin-top: 0 !important;
   border-top-left-radius: 0 !important;
   border-top-right-radius: 0 !important;
   opacity: 0.92;
 }
 
 .info-card--accent {
-  margin-left: 48px;
+  margin-left: 16px;
   background: rgb(242, 104, 151);
 }
 

@@ -109,3 +109,30 @@ export async function fetchCostReport(aiId, isScreening = true) {
     };
   });
 }
+
+export async function fetchAIFromEaseFica(aiId) {
+  return tryRequest(async (client) => {
+    if (!aiId) {
+      throw new Error('AI ID is required to fetch AI details.');
+    }
+
+    const response = await client.get(
+      '/easefica-screening/auth/auth/getAIFromEaseFica',
+      { params: { aiId } },
+    );
+    return response.data;
+  });
+}
+
+export async function fetchUserRoleByEmail(email) {
+  return tryRequest(async (client) => {
+    if (!email) {
+      throw new Error('Email is required to fetch user role.');
+    }
+
+    const response = await client.get('/easefica-screening/auth/auth/getUser', {
+      params: { id: email },
+    });
+    return response.data;
+  });
+}

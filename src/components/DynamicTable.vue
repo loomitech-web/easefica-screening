@@ -108,17 +108,17 @@ const filteredContent = computed(() => {
 
 <style scoped>
 .dynamic-table-panel {
-    background: var(--ef-surface);
-    border: 1px solid rgba(230, 230, 230, 0.9);
-    box-shadow: 0 6px 16px rgba(16, 54, 82, 0.08) !important;
-    border-radius: 12px !important;
+    background: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0px 0px 10px #ccc !important;
+    border-radius: 10px !important;
     overflow: hidden;
 }
 
 .dynamic-table-panel__toolbar {
     padding: 16px 16px 8px;
-    border-bottom: 1px solid rgba(230, 230, 230, 0.9);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(246, 250, 253, 0.98));
+    border-bottom: 1px solid #ccc;
+    background: #fff;
 }
 
 .dynamic-table-filter :deep(.v-field) {
@@ -131,40 +131,62 @@ const filteredContent = computed(() => {
 }
 
 .dynamic-table :deep(table) {
-    border-collapse: separate;
-    border-spacing: 0;
+    border-collapse: collapse;
 }
 
 .dynamic-table :deep(.v-data-table-header th),
 .dynamic-table :deep(thead th) {
-    background: rgba(10, 124, 185, 0.08) !important;
-    color: var(--ef-secondary) !important;
+    background-color: #f2f2f2 !important;
+    color: #666 !important;
     font-size: 12px;
-    font-weight: 600 !important;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    border-bottom: 1px solid rgba(230, 230, 230, 0.9);
+    font-weight: 700 !important;
+    letter-spacing: 0;
+    text-transform: none;
+    border: 1px solid #ddd;
+    padding: 8px 10px !important;
 }
 
 .dynamic-table :deep(.v-data-table-header__content) {
-    color: var(--ef-secondary) !important;
-    font-weight: 600 !important;
+    color: #666 !important;
+    font-weight: 700 !important;
     opacity: 1 !important;
 }
 
 .dynamic-table :deep(tbody td) {
-    color: #173042;
+    color: #666 !important;
     font-size: 14px;
-    border-bottom: 1px solid rgba(230, 230, 230, 0.65);
+    border: 1px solid #ddd;
+    padding: 8px 10px !important;
 }
 
 .dynamic-table :deep(tbody tr:hover) {
-    background: rgba(10, 124, 185, 0.04) !important;
+    background-color: #50abca !important;
 }
 
-.dynamic-table :deep(.v-data-table__tr:last-child td) {
-    border-bottom: none;
+.dynamic-table :deep(tbody tr:hover td) {
+    color: #fff !important;
 }
+
+/* Vuetify rows use specific classes; cover those too. */
+.dynamic-table :deep(.v-data-table__tr:hover) {
+    background-color: #50abca !important;
+}
+
+.dynamic-table :deep(.v-data-table__tr:hover td),
+.dynamic-table :deep(.v-data-table__tr:hover .v-data-table__td) {
+    background-color: #50abca !important;
+    color: #fff !important;
+}
+
+.dynamic-table :deep(tbody tr:nth-of-type(even)) {
+    background-color: #e4f8ff !important;
+}
+
+.dynamic-table :deep(tbody tr:nth-of-type(odd)) {
+    background-color: #fff !important;
+}
+
+
 
 @media (max-width: 960px) {
     .dynamic-table-panel__toolbar {
@@ -174,6 +196,7 @@ const filteredContent = computed(() => {
     .dynamic-table :deep(thead th),
     .dynamic-table :deep(tbody td) {
         font-size: 13px;
+        padding: 7px 8px !important;
     }
 }
 </style>
