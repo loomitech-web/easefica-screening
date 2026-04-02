@@ -15,18 +15,18 @@ defineProps({
   icon: {
     type: String,
     required: false,
-    default: 'mdi-shield-check',
+    default: '',
   },
 });
 </script>
 
 <template>
   <div class="page-header">
-    <div class="page-icon-container">
+    <!-- <div class="page-icon-container">
       <img v-if="iconSrc" :src="iconSrc" alt="" class="page-icon-image">
       <i v-else-if="icon.startsWith('fi ')" :class="icon" class="page-icon" aria-hidden="true" />
       <v-icon v-else :icon="icon" size="48" />
-    </div>
+    </div> -->
     <div class="logo-container">
       <img :src="logoBlue" alt="Easefica Logo" class="logo">
     </div>

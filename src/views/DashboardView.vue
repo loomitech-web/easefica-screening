@@ -5,7 +5,7 @@ import PageHeader from '../components/PageHeader.vue';
 import DynamicTable from '../components/DynamicTable.vue';
 import { useScreeningStore } from '../stores/screening';
 import { useAuthStore } from '../stores/auth';
-import dashboardMonitorIcon from '../assets/dashboard-monitor.svg';
+//import dashboardMonitorIcon from '../assets/dashboard-monitor.svg';
 
 const screeningStore = useScreeningStore();
 const { summary, history, error } = storeToRefs(screeningStore);
@@ -107,11 +107,11 @@ function onPageSizeChange(nextPageSize) {
 <template>
   <v-container fluid class="screen-container">
     <div class="screen">
-      <div class="page-icon-container">
+      <!-- <div class="page-icon-container">
         <img v-if="iconSrc" :src="iconSrc" alt="" class="page-icon-image">
         <i v-else-if="icon.startsWith('fi ')" :class="icon" class="page-icon" aria-hidden="true" />
         <v-icon v-else :icon="icon" size="48" />
-      </div>
+      </div> -->
 
       <PageHeader title="Screening Dashboard" />
 
