@@ -53,13 +53,14 @@ function onUpdate(value) {
 <template>
   <v-text-field class="field-control" :model-value="props.modelValue" :label="props.label" :type="props.type"
     :placeholder="props.placeholder" :hint="props.hint" :error-messages="props.errorMessages" :disabled="props.disabled"
-    :loading="props.loading" :clearable="props.clearable" :prepend-inner-icon="props.prependInnerIcon" variant="outlined"
-    density="comfortable" hide-details="auto"
-    @update:model-value="onUpdate" @blur="$emit('blur', $event)" />
+    :loading="props.loading" :clearable="props.clearable" :prepend-inner-icon="props.prependInnerIcon"
+    variant="outlined" density="comfortable" hide-details="auto" @update:model-value="onUpdate"
+    @blur="$emit('blur', $event)" />
 </template>
 
 <style scoped>
 .field-control {
-  width: 100%;
+  width: 220px;
+  max-width: 100%;
 }
 </style>

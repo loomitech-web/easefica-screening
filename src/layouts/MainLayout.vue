@@ -122,8 +122,6 @@ function navigate(to) {
         </v-row>
       </v-toolbar-title>
 
-      <v-spacer />
-
       <v-card class="info-card info-card--primary" elevation="10">
         <div class="info-card__inner">
           <v-icon icon="mdi-account" />

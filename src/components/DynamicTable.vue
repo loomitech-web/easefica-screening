@@ -1,23 +1,19 @@
 <template>
     <v-card class="dynamic-table-panel">
         <div v-if="filterControls" class="dynamic-table-panel__toolbar">
-            <v-row class="align-center" compact>
-                <v-col v-if="filterControls.search" cols="12" md="4">
+            <v-row class="align-center justify-end dynamic-table-panel__toolbar-row" compact>
+                <v-col v-if="filterControls.search" cols="12" md="auto" class="dynamic-table-panel__filter-col">
                     <InputField v-model="search" label="Search subjects..." prepend-inner-icon="mdi-magnify"
                         placeholder="Search subjects..." />
                 </v-col>
 
-                <v-col v-if="filterControls.categoryFilter" cols="12" md="4">
-                    <v-select v-model="selectedCategory" class="dynamic-table-filter"
-                        :items="filterControls.categoryFilters" label="Category" variant="outlined" hide-details
-                        density="compact" clearable />
+                <v-col v-if="filterControls.categoryFilter" cols="12" md="auto" class="dynamic-table-panel__filter-col">
+                    <BaseSelect v-model="selectedCategory" :items="filterControls.categoryFilters" label="Sort by..." />
                 </v-col>
 
-                <v-col v-if="filterControls.dateFilter" cols="12" md="4">
-                    <DateField v-model="selectedDateRange" label="Filter by Date" />
+                <v-col v-if="filterControls.dateFilter" cols="12" md="auto" class="dynamic-table-panel__filter-col">
+                    <DateField v-model="selectedDateRange" label="Filter between dates" />
                 </v-col>
-
-
             </v-row>
         </div>
 
@@ -39,6 +35,7 @@
 import { ref, computed } from 'vue'
 import InputField from './fields/InputField.vue'
 import DateField from './fields/DateField.vue'
+import BaseSelect from './fields/BaseSelect.vue'
 
 const props = defineProps({
     headers: { type: Array, required: true },
@@ -124,9 +121,24 @@ const filteredContent = computed(() => {
     background: #fff;
 }
 
+.dynamic-table-panel__toolbar-row {
+    justify-content: flex-start;
+}
+
+.dynamic-table-panel__filter-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
 .dynamic-table-filter :deep(.v-field) {
     border-radius: var(--border-radius);
     background: rgba(255, 255, 255, 0.96);
+}
+
+.dynamic-table-filter {
+    width: 220px;
+    max-width: 100%;
 }
 
 .dynamic-table {
@@ -194,6 +206,14 @@ const filteredContent = computed(() => {
 @media (max-width: 960px) {
     .dynamic-table-panel__toolbar {
         padding: 12px 12px 4px;
+    }
+
+    .dynamic-table-panel__toolbar-row {
+        justify-content: flex-start;
+    }
+
+    .dynamic-table-panel__filter-col {
+        justify-content: flex-start;
     }
 
     .dynamic-table :deep(thead th),

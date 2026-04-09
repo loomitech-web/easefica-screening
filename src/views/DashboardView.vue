@@ -1,23 +1,28 @@
 <script setup>
 import { computed, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
-import PageHeader from '../components/PageHeader.vue';
-import DynamicTable from '../components/DynamicTable.vue';
+
+// Stores
 import { useScreeningStore } from '../stores/screening';
 import { useAuthStore } from '../stores/auth';
-//import dashboardMonitorIcon from '../assets/dashboard-monitor.svg';
 
+// Components 
+import PageHeader from '../components/PageHeader.vue';
+import DynamicTable from '../components/DynamicTable.vue';
+
+// Store Instances
 const screeningStore = useScreeningStore();
-const { summary, history, error } = storeToRefs(screeningStore);
 const authStore = useAuthStore();
-const { token } = storeToRefs(authStore);
-const { profile } = storeToRefs(authStore);
 
+// Store References
+const { summary, history, error } = storeToRefs(screeningStore);
+const { token, profile } = storeToRefs(authStore);
+
+// Computed Properties
 const aiId = computed(() => profile.value?.['https://admin.easefica.co.za/metadata']?.aiId || null);
 const totalCount = computed(() => summary.value?.totalNumberOfScreenings || 0);
 const page = computed(() => screeningStore.query.page);
 const pageSize = computed(() => screeningStore.query.pageSize);
-
 const lastScreenedAt = computed(() => summary.value?.latestScreening?.timestamp || null);
 
 function formatScreeningDate(dateString) {
@@ -75,10 +80,10 @@ const content = computed(() => {
 })
 
 const filterControls = {
-  search: true,
+  search: false,
   dateFilter: true,
-  categoryFilter: true,
-  categoryFilters: ['PEP', 'Sanctions', 'Adverse Media'],
+  categoryFilter: false,
+  // categoryFilters: [headers[0].title, headers[3].title, headers[2].title],
 }
 
 function onPageChange(nextPage) {
@@ -155,15 +160,6 @@ function formatScreeningLists() {
 </template>
 
 <style scoped>
-.dashboard-container {
-  padding-inline-start: 5rem;
-}
-
-.screen {
-  width: min(100%, 1240px);
-  padding: 20px;
-}
-
 .dashboard-stats-row {
   margin-top: 8px;
 }

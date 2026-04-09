@@ -66,10 +66,18 @@ const showDatePicker = ref(false)
 </template>
 
 <style scoped>
+.field-control-anchor {
+    display: block;
+    width: 100%;
+}
+
 .field-control {
     display: flex;
     align-items: center;
+    justify-content: flex-start;
     gap: 8px;
+    width: 220px;
+    max-width: 100%;
     padding: 8px 16px;
     border-radius: var(--border-radius);
     background: var(--ef-surface);
