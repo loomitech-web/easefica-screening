@@ -158,15 +158,10 @@ function formatScreeningLists() {
 <template>
   <v-container fluid class="screen-container dashboard-container">
     <div class="screen">
-      <!-- <div class="page-icon-container">
-        <img v-if="iconSrc" :src="iconSrc" alt="" class="page-icon-image">
-        <i v-else-if="icon.startsWith('fi ')" :class="icon" class="page-icon" aria-hidden="true" />
-        <v-icon v-else :icon="icon" size="48" />
-      </div> -->
 
       <PageHeader title="Screening Dashboard" />
 
-      <v-row class="dashboard-stats-row">
+      <v-row class="stats-row">
         <v-col cols="12" md="4">
           <div class="stat-card">
             <span class="stat-number">{{ summary.totalNumberOfScreenings }}</span>
@@ -200,37 +195,6 @@ function formatScreeningLists() {
 </template>
 
 <style scoped>
-.dashboard-stats-row {
-  margin-top: 8px;
-}
-
-.stat-card {
-  text-align: center;
-  padding: 16px;
-  border-radius: 8px;
-  background: var(--ef-surface);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.stat-number {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #1976d2;
-  display: block;
-  line-height: 1.2;
-  word-break: break-word;
-}
-
-.stat-label {
-  font-size: 0.9rem;
-  color: #666;
-  margin-top: 4px;
-}
-
 @media (max-width: 960px) {
   .screen {
     padding: 16px;

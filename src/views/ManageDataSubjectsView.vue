@@ -1,58 +1,177 @@
 <script setup>
-import { reactive } from 'vue';
-import BaseInput from '../components/fields/InputField.vue';
-import BaseSelect from '../components/fields/BaseSelect.vue';
-import FileUpload from '../components/fields/FileUpload.vue';
+import { computed, onMounted, ref } from 'vue';
+import { storeToRefs } from 'pinia';
 
-const subjectTypes = [
-  { title: 'Individual', value: 'individual' },
-  { title: 'Company', value: 'company' },
-  { title: 'Trust', value: 'trust' },
+import PageHeader from '../components/PageHeader.vue';
+import DynamicTable from '../components/DynamicTable.vue';
+import { useAuthStore } from '../stores/auth';
+import {
+  fetchDataSubjects,
+  downloadDataSubjectsTemplate,
+  downloadLastUploadedDataSubjects,
+} from '../services/server';
+
+const authStore = useAuthStore();
+const { token, profile } = storeToRefs(authStore);
+
+const aiId = computed(
+  () => profile.value?.['https://admin.easefica.co.za/metadata']?.aiId || null,
+);
+
+const page = ref(1);
+const pageSize = ref(10);
+const totalCount = ref(0);
+const content = ref([]);
+const error = ref('');
+const isLoading = ref(false);
+
+const hasUpload = computed(() => totalCount.value > 0);
+
+const filterControls = computed(() => ({
+  search: true,
+  dateFilter: false,
+  dateRangeFilter: false,
+  categoryFilter: false,
+  manageDataSubjects: true,
+  hasUpload: hasUpload.value,
+}));
+
+const headers = [
+  { key: 'isValid', title: 'Valid' },
+  { key: 'firstName', title: 'First Name' },
+  { key: 'secondName', title: 'Second Name' },
+  { key: 'thirdName', title: 'Third Name' },
+  { key: 'fourthName', title: 'Fourth Name' },
+  { key: 'lastName', title: 'Last Name' },
+  { key: 'alias1', title: 'Alias 1' },
+  { key: 'alias2', title: 'Alias 2' },
+  { key: 'id', title: 'ID' },
 ];
 
-const form = reactive({
-  subjectName: '',
-  referenceId: '',
-  subjectType: null,
-  attachments: [],
+function mapDocToRow(doc) {
+  const ds = doc.dataSubject || {};
+  return {
+    isValid: doc.isActive === true ? 'Yes' : 'No',
+    firstName: ds.firstName ?? '',
+    secondName: ds.secondName ?? '',
+    thirdName: ds.thirdName ?? '',
+    fourthName: ds.fourthName ?? '',
+    lastName: ds.lastName ?? '',
+    alias1: ds.alias1 ?? '',
+    alias2: ds.alias2 ?? '',
+    id: ds.id ?? ds.id_reg_number ?? '',
+  };
+}
+
+function triggerFileDownload(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function loadDataSubjects() {
+  if (!aiId.value) return;
+  isLoading.value = true;
+  error.value = '';
+  try {
+    const { items, total } = await fetchDataSubjects({
+      aiId: aiId.value,
+      page: page.value,
+      pageSize: pageSize.value,
+    });
+    content.value = (items || []).map(mapDocToRow);
+    totalCount.value = total;
+  } catch (err) {
+    console.error('ManageDataSubjectsView | load failed', err);
+    error.value = err?.message || 'Could not load data subjects.';
+    content.value = [];
+    totalCount.value = 0;
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+onMounted(() => {
+  if (token.value && profile.value) {
+    if (aiId.value) {
+      loadDataSubjects();
+    } else {
+      error.value = 'AI ID not found in profile.';
+    }
+  }
 });
 
-function submit() {
-  // Placeholder submit action while backend endpoint wiring is phased in.
-  console.info('Data subject payload', form);
+function onPageChange(nextPage) {
+  page.value = nextPage;
+  loadDataSubjects();
+}
+
+function onPageSizeChange(nextPageSize) {
+  pageSize.value = nextPageSize;
+  page.value = 1;
+  loadDataSubjects();
+}
+
+async function onDownload() {
+  error.value = '';
+  try {
+    if (hasUpload.value) {
+      if (!aiId.value) {
+        error.value = 'AI ID is required to download the last upload.';
+        return;
+      }
+      const { blob, filename } = await downloadLastUploadedDataSubjects(aiId.value);
+      triggerFileDownload(blob, filename || 'data_subjects_last_upload.xlsx');
+    } else {
+      const { blob, filename } = await downloadDataSubjectsTemplate();
+      triggerFileDownload(blob, filename || 'data_subjects_template.xlsx');
+    }
+  } catch (err) {
+    console.error('ManageDataSubjectsView | download failed', err);
+    error.value = err?.message || 'Download failed.';
+  }
 }
 </script>
 
 <template>
-  <v-container fluid class="screen-page">
-    <v-row>
-      <v-col cols="12" md="8">
-        <h1 class="text-h5 mb-4 screen-page__title">Manage Data Subjects</h1>
-        <v-card class="pa-6 screen-panel">
-          <v-card-title class="px-0 screen-panel__title">Manage Data Subjects</v-card-title>
-          <v-card-text class="px-0">
-            <v-row>
-              <v-col cols="12" md="6">
-                <BaseInput v-model="form.subjectName" label="Subject Name" hint="Legal name of subject" />
-              </v-col>
-              <v-col cols="12" md="6">
-                <BaseInput v-model="form.referenceId" label="Reference ID" hint="Internal traceability code" />
-              </v-col>
-              <v-col cols="12" md="6">
-                <BaseSelect v-model="form.subjectType" :items="subjectTypes" label="Subject Type"
-                  hint="Select the entity category" />
-              </v-col>
-              <v-col cols="12">
-                <FileUpload v-model="form.attachments" label="Supporting Document"
-                  hint="Upload optional KYC support files" />
-              </v-col>
-            </v-row>
-          </v-card-text>
-          <v-card-actions class="px-0">
-            <v-btn color="primary" @click="submit">Save Subject</v-btn>
-          </v-card-actions>
-        </v-card>
+  <v-container fluid class="screen-container dashboard-container">
+    <div class="screen">
+      <PageHeader title="Manage Data Subjects" />
+
+      <v-col cols="12" md="auto">
+        <div class="stat-card">
+          <span class="stat-number">{{ totalCount }}</span>
+          <div class="stat-label">Data subjects to be screened <span class="accent-text"> after midnight</span>
+          </div>
+        </div>
       </v-col>
-    </v-row>
+
+      <div class="dynamic-table-container">
+        <DynamicTable :headers="headers" :content="content" :filterControls="filterControls" :totalCount="totalCount"
+          :page="page" :pageSize="pageSize" @update:page="onPageChange" @update:pageSize="onPageSizeChange"
+          @download="onDownload" />
+      </div>
+    </div>
+    <v-alert v-if="error" class="mt-4" type="error" variant="tonal">
+      {{ error }}
+    </v-alert>
   </v-container>
 </template>
+
+<style scoped>
+.controls-container {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.dynamic-table-container {
+  margin-top: 20px;
+}
+</style>

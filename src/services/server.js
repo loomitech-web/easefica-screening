@@ -142,3 +142,93 @@ export async function fetchUserRoleByEmail(email) {
     return response.data;
   });
 }
+
+function filenameFromContentDisposition(header) {
+  if (!header || typeof header !== 'string') return null;
+  const utf8Match = header.match(/filename\*=UTF-8''([^;]+)/i);
+  if (utf8Match) {
+    try {
+      return decodeURIComponent(utf8Match[1].trim());
+    } catch {
+      return utf8Match[1].trim();
+    }
+  }
+  const quoted = header.match(/filename="([^"]+)"/i);
+  if (quoted) return quoted[1];
+  const simple = header.match(/filename=([^;\s]+)/i);
+  if (simple) return simple[1].replace(/^["']|["']$/g, '');
+  return null;
+}
+
+/**
+ * Active data subjects for the AI (paged). Uses OData-style $skip / $top / $count on the backend.
+ */
+export async function fetchDataSubjects(params = {}) {
+  return tryRequest(async (client) => {
+    if (!params.aiId) {
+      throw new Error('AI ID is required to load data subjects.');
+    }
+    const page = Math.max(1, Number(params.page || 1));
+    const pageSize = Math.max(1, Number(params.pageSize || 10));
+    const $skip = (page - 1) * pageSize;
+    const $top = pageSize;
+
+    const response = await client.get('/easefica-screening/screening/screening/getDataSubjects', {
+      params: {
+        aiId: params.aiId,
+        $skip,
+        $top,
+        $count: true,
+      },
+    });
+
+    const body = response.data;
+    if (body && Array.isArray(body.value) && body['@odata.count'] != null) {
+      return {
+        items: body.value,
+        total: Number(body['@odata.count']) || 0,
+      };
+    }
+    if (body && Array.isArray(body.dataSubjects)) {
+      return {
+        items: body.dataSubjects,
+        total: Number(body.totalCount) || body.dataSubjects.length,
+      };
+    }
+    return { items: [], total: 0 };
+  });
+}
+
+export async function downloadDataSubjectsTemplate() {
+  return tryRequest(async (client) => {
+    const response = await client.get('/easefica-screening/screening/screening/getTemplate', {
+      responseType: 'arraybuffer',
+    });
+    const blob = new Blob([response.data], {
+      type:
+        response.headers['content-type'] ||
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
+    const filename = filenameFromContentDisposition(response.headers['content-disposition']);
+    return { blob, filename };
+  });
+}
+
+export async function downloadLastUploadedDataSubjects(aiId) {
+  return tryRequest(async (client) => {
+    if (!aiId) {
+      throw new Error('AI ID is required to download the last upload.');
+    }
+    const response = await client.get('/easefica-screening/screening/screening/downloadLastUpload', {
+      params: { aiId },
+      responseType: 'arraybuffer',
+    });
+    const blob = new Blob([response.data], {
+      type:
+        response.headers['content-type'] ||
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
+    const filename = filenameFromContentDisposition(response.headers['content-disposition']);
+    return { blob, filename };
+  });
+}

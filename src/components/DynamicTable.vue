@@ -1,7 +1,7 @@
 <template>
     <v-card class="dynamic-table-panel">
         <div v-if="filterControls" class="dynamic-table-panel__toolbar">
-            <v-row class="align-center justify-end dynamic-table-panel__toolbar-row" compact>
+            <v-row class="dynamic-table-panel__toolbar-row" compact>
                 <v-col v-if="filterControls.search" cols="12" md="auto" class="dynamic-table-panel__filter-col">
                     <InputField v-model="search" label="Search subjects..." prepend-inner-icon="mdi-magnify"
                         placeholder="Search subjects..." />
@@ -14,9 +14,22 @@
                 <v-col v-if="filterControls.dateFilter" cols="12" md="auto" class="dynamic-table-panel__filter-col">
                     <DateField v-model="selectedDateRange" label="Select date" />
                 </v-col>
+
                 <v-col v-if="filterControls.dateRangeFilter" cols="12" md="auto"
                     class="dynamic-table-panel__filter-col">
                     <DateRangeField v-model="selectedDateRange" label="Select date range" />
+                </v-col>
+
+                <v-col v-if="filterControls.manageDataSubjects" cols="12" md="auto"
+                    class="dynamic-table-panel__filter-col">
+                    <FileUpload v-model="file" label="Upload file" />
+                </v-col>
+
+                <v-col v-if="filterControls.manageDataSubjects" cols="12" md="auto"
+                    class="dynamic-table-panel__filter-col">
+                    <v-btn class="download-button" variant="outlined" prepend-icon="mdi-file-download-outline"
+                        @click="downloadPreviousUpload"> {{ filterControls.hasUpload ? 'Download previous upload' :
+                            'Download template' }}</v-btn>
                 </v-col>
             </v-row>
         </div>
@@ -41,6 +54,7 @@ import InputField from './fields/InputField.vue'
 import DateField from './fields/DateField.vue'
 import BaseSelect from './fields/BaseSelect.vue'
 import DateRangeField from './fields/DateRangeField.vue'
+import FileUpload from './fields/FileUpload.vue'
 
 const props = defineProps({
     headers: { type: Array, required: true },
@@ -52,7 +66,9 @@ const props = defineProps({
             dateFilter: false,
             dateRangeFilter: false,
             categoryFilter: false,
-            categoryFilters: []
+            categoryFilters: [],
+            manageDataSubjects: false,
+            hasUpload: false,
         })
     },
     totalCount: { type: Number, required: true },
@@ -235,5 +251,14 @@ watch(selectedDateRange, (value) => {
         font-size: 13px;
         padding: 7px 8px !important;
     }
+}
+
+.download-button {
+    border-color: var(--ef-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--ef-accent);
+    color: #fff;
+    height: 40px;
+    margin-bottom: 4px;
 }
 </style>

@@ -24,6 +24,7 @@ const drawer = ref(true);
 const topLevelItems = [
   { title: 'Dashboard', icon: 'mdi-view-dashboard-outline', to: { name: 'dashboard' } },
   { title: 'Manage Data Subjects', icon: 'mdi-account-multiple-outline', to: { name: 'manage-data-subjects' } },
+  { title: 'Manage Screening', icon: 'mdi-account-search-outline', to: { name: 'manage-screening' } },
 ];
 
 const reportItems = [
@@ -36,8 +37,8 @@ const userDisplayName = computed(
   () => profile.value?.nickname || profile.value?.email || 'Authenticated User',
 );
 console.log("profile: ", JSON.stringify(profile.value, null, 2));
-const companyDisplay = computed(() => profile.value?.company || 'Easefica Screening');
-const roleDisplay = computed(() => profile.value?.role || 'Screening Analyst');
+const companyDisplay = computed(() => profile.value?.company);
+const roleDisplay = computed(() => profile.value?.role);
 const showBusy = computed(() => screeningStore.isLoading || reportsStore.isLoading);
 
 const reportsOpen = ref(route.path.startsWith('/reports'));

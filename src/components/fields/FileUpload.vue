@@ -43,22 +43,23 @@ function onUpdate(value) {
 </script>
 
 <template>
-  <v-file-input
-    class="field-control"
-    :model-value="props.modelValue"
-    :label="props.label"
-    :accept="props.accept"
-    :hint="props.hint"
-    :error-messages="props.errorMessages"
-    :disabled="props.disabled"
-    :loading="props.loading"
-    :multiple="props.multiple"
-    variant="outlined"
-    density="comfortable"
-    hide-details="auto"
-    show-size
-    prepend-icon="mdi-paperclip"
-    @update:model-value="onUpdate"
-    @blur="$emit('blur', $event)"
-  />
+  <div class="field-control-anchor">
+    <v-file-input class="field-control" :model-value="props.modelValue" :label="props.label" :accept="props.accept"
+      :error-messages="props.errorMessages" :disabled="props.disabled" :loading="props.loading" variant="plain"
+      density="comfortable" hide-details="auto" show-size prepend-icon="mdi-paperclip" @update:model-value="onUpdate" />
+  </div>
 </template>
+
+<style scoped>
+.field-control-anchor {
+  display: block;
+  width: 100%;
+}
+
+.field-control {
+  width: 220px;
+  max-width: 100%;
+  border-radius: var(--border-radius) !important;
+  border: dashed 2px #a7a7a7;
+}
+</style>
