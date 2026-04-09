@@ -16,7 +16,7 @@
                 </v-col>
                 <v-col v-if="filterControls.dateRangeFilter" cols="12" md="auto"
                     class="dynamic-table-panel__filter-col">
-                    <DateRangeField v-model="selectedDateRange" label="Select date" />
+                    <DateRangeField v-model="selectedDateRange" label="Select date range" />
                 </v-col>
             </v-row>
         </div>
