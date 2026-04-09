@@ -12,7 +12,11 @@
                 </v-col>
 
                 <v-col v-if="filterControls.dateFilter" cols="12" md="auto" class="dynamic-table-panel__filter-col">
-                    <DateField v-model="selectedDateRange" label="Filter between dates" />
+                    <DateField v-model="selectedDateRange" label="Select date" />
+                </v-col>
+                <v-col v-if="filterControls.dateRangeFilter" cols="12" md="auto"
+                    class="dynamic-table-panel__filter-col">
+                    <DateRangeField v-model="selectedDateRange" label="Select date" />
                 </v-col>
             </v-row>
         </div>
@@ -32,10 +36,11 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import InputField from './fields/InputField.vue'
 import DateField from './fields/DateField.vue'
 import BaseSelect from './fields/BaseSelect.vue'
+import DateRangeField from './fields/DateRangeField.vue'
 
 const props = defineProps({
     headers: { type: Array, required: true },
@@ -45,6 +50,7 @@ const props = defineProps({
         default: () => ({
             search: false,
             dateFilter: false,
+            dateRangeFilter: false,
             categoryFilter: false,
             categoryFilters: []
         })
@@ -54,7 +60,7 @@ const props = defineProps({
     pageSize: { type: Number, required: true },
 })
 
-const emit = defineEmits(['update:page', 'update:pageSize'])
+const emit = defineEmits(['update:page', 'update:pageSize', 'update:dateRange'])
 
 function onPageChange(value) {
     console.log('DynamicTable | page changed', {
@@ -77,7 +83,10 @@ function onItemsPerPageChange(value) {
 }
 
 const search = ref('')
-const selectedDateRange = ref('')
+const selectedDateRange = ref({
+    startDate: null,
+    endDate: null,
+})
 const selectedCategory = ref(null)
 const pagination = computed(() => ({
     page: props.page,
@@ -104,6 +113,11 @@ const filteredContent = computed(() => {
 
     return data
 })
+
+
+watch(selectedDateRange, (value) => {
+    emit('update:dateRange', value || { startDate: null, endDate: null })
+}, { deep: true })
 </script>
 
 <style scoped>

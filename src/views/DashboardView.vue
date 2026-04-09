@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 
 // Stores
@@ -15,15 +15,27 @@ const screeningStore = useScreeningStore();
 const authStore = useAuthStore();
 
 // Store References
-const { summary, history, error } = storeToRefs(screeningStore);
+const { summary, history, total, error } = storeToRefs(screeningStore);
 const { token, profile } = storeToRefs(authStore);
 
 // Computed Properties
 const aiId = computed(() => profile.value?.['https://admin.easefica.co.za/metadata']?.aiId || null);
-const totalCount = computed(() => summary.value?.totalNumberOfScreenings || 0);
 const page = computed(() => screeningStore.query.page);
 const pageSize = computed(() => screeningStore.query.pageSize);
 const lastScreenedAt = computed(() => summary.value?.latestScreening?.timestamp || null);
+const selectedDateRange = ref({
+  startDate: null,
+  endDate: null,
+});
+const hasActiveDateRange = computed(() =>
+  Boolean(selectedDateRange.value?.startDate || selectedDateRange.value?.endDate)
+);
+const totalCount = computed(() => {
+  if (hasActiveDateRange.value) {
+    return total.value || 0;
+  }
+  return summary.value?.totalNumberOfScreenings || total.value || 0;
+});
 
 function formatScreeningDate(dateString) {
   if (!dateString) return 'N/A';
@@ -81,7 +93,8 @@ const content = computed(() => {
 
 const filterControls = {
   search: false,
-  dateFilter: true,
+  dateFilter: false,
+  dateRangeFilter: true,
   categoryFilter: false,
   // categoryFilters: [headers[0].title, headers[3].title, headers[2].title],
 }
@@ -94,7 +107,13 @@ function onPageChange(nextPage) {
   });
 
   if (!aiId.value) return;
-  screeningStore.loadHistory({ aiId: aiId.value, page: nextPage });
+  screeningStore.loadHistory({
+    aiId: aiId.value,
+    page: nextPage,
+    pageSize: pageSize.value,
+    startDate: selectedDateRange.value.startDate || undefined,
+    endDate: selectedDateRange.value.endDate || undefined,
+  });
 }
 
 function onPageSizeChange(nextPageSize) {
@@ -105,7 +124,27 @@ function onPageSizeChange(nextPageSize) {
   });
 
   if (!aiId.value) return;
-  screeningStore.loadHistory({ aiId: aiId.value, page: 1, pageSize: nextPageSize });
+  screeningStore.loadHistory({
+    aiId: aiId.value,
+    page: 1,
+    pageSize: nextPageSize,
+    startDate: selectedDateRange.value.startDate || undefined,
+    endDate: selectedDateRange.value.endDate || undefined,
+  });
+}
+
+function onDateRangeChange(nextDateRange) {
+  selectedDateRange.value = nextDateRange || { startDate: null, endDate: null };
+
+  if (!aiId.value) return;
+
+  screeningStore.loadHistory({
+    aiId: aiId.value,
+    page: 1,
+    pageSize: pageSize.value,
+    startDate: selectedDateRange.value.startDate || undefined,
+    endDate: selectedDateRange.value.endDate || undefined,
+  });
 }
 
 function formatScreeningLists() {
@@ -150,7 +189,8 @@ function formatScreeningLists() {
 
       <div class="dynamic-table-container">
         <DynamicTable :headers="headers" :content="content" :filterControls="filterControls" :totalCount="totalCount"
-          :page="page" :pageSize="pageSize" @update:page="onPageChange" @update:pageSize="onPageSizeChange" />
+          :page="page" :pageSize="pageSize" @update:page="onPageChange" @update:pageSize="onPageSizeChange"
+          @update:dateRange="onDateRangeChange" />
       </div>
     </div>
     <v-alert v-if="error" class="mt-4" type="error" variant="tonal">
