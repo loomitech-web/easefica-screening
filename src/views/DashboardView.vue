@@ -156,7 +156,7 @@ function formatScreeningLists() {
 
 <style scoped>
 .dashboard-container {
-  padding-inline-start: 12px;
+  padding-inline-start: 5rem;
 }
 
 .screen {
