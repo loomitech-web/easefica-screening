@@ -1,6 +1,6 @@
 <script setup>
 import { reactive } from 'vue';
-import BaseInput from '../components/fields/BaseInput.vue';
+import BaseInput from '../components/fields/InputField.vue';
 import BaseSelect from '../components/fields/BaseSelect.vue';
 import FileUpload from '../components/fields/FileUpload.vue';
 
@@ -39,19 +39,12 @@ function submit() {
                 <BaseInput v-model="form.referenceId" label="Reference ID" hint="Internal traceability code" />
               </v-col>
               <v-col cols="12" md="6">
-                <BaseSelect
-                  v-model="form.subjectType"
-                  :items="subjectTypes"
-                  label="Subject Type"
-                  hint="Select the entity category"
-                />
+                <BaseSelect v-model="form.subjectType" :items="subjectTypes" label="Subject Type"
+                  hint="Select the entity category" />
               </v-col>
               <v-col cols="12">
-                <FileUpload
-                  v-model="form.attachments"
-                  label="Supporting Document"
-                  hint="Upload optional KYC support files"
-                />
+                <FileUpload v-model="form.attachments" label="Supporting Document"
+                  hint="Upload optional KYC support files" />
               </v-col>
             </v-row>
           </v-card-text>

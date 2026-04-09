@@ -5,6 +5,9 @@
   --ef-surface: rgba(255, 255, 255, 0.96);
   --ef-border: #e6e6e6;
   --ef-text-soft: #5d6b78;
+  --ef-surface-hover: #50abca;
+  --ef-border-hover: rgba(27, 90, 125, 0.2);
+  --border-radius: 8px;
 }
 
 html,
@@ -28,7 +31,7 @@ body {
 }
 
 .v-card {
-  border-radius: 8px !important;
+  border-radius: var(--border-radius) !important;
 }
 .screen-container {
   padding: 16px;
@@ -46,5 +49,34 @@ body {
   border: 1px solid rgba(230, 230, 230, 0.9);
   box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.1), 0 5px 8px rgba(0, 0, 0, 0.05), 0 1px 14px rgba(0, 0, 0, 0.01) !important;
   padding: 16px;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
+}
+
+.field-control .v-field {
+  border-radius: var(--border-radius) !important;
+  background: var(--ef-surface);
+}
+
+/* Wrap trigger + overlay; overlay is position:absolute so it does not grow flex/grid parents. */
+.field-control-anchor {
+  position: relative;
+  display: inline-block;
+  width: fit-content;
+  max-width: 100%;
+  vertical-align: top;
+}
+
+.field-control-overlay {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 8px;
+  width: fit-content;
+  height: fit-content;
+  max-width: min(100vw - 32px, 360px);
+  background: var(--ef-surface);
+  z-index: 1000;
+  border-radius: var(--border-radius);
+  box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.1), 0 5px 8px rgba(0, 0, 0, 0.05), 0 1px 14px rgba(0, 0, 0, 0.01) !important;
+  padding: 16px;
 }

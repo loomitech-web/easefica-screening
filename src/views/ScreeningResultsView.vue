@@ -2,7 +2,7 @@
 import { onMounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
-import BaseInput from '../components/fields/BaseInput.vue';
+import BaseInput from '../components/fields/InputField.vue';
 import { useScreeningStore } from '../stores/screening';
 
 const router = useRouter();
@@ -38,12 +38,7 @@ function openReport(item) {
         <h1 class="text-h5 mb-4 screen-page__title">Screening Results</h1>
       </v-col>
       <v-col cols="12" md="4">
-        <BaseInput
-          v-model="search"
-          label="Search"
-          placeholder="Search by subject or reference"
-          clearable
-        />
+        <BaseInput v-model="search" label="Search" placeholder="Search by subject or reference" clearable />
       </v-col>
     </v-row>
 
@@ -86,12 +81,8 @@ function openReport(item) {
             <div class="text-caption">
               Page {{ pagination.page }} of {{ pagination.pageCount }} | {{ pagination.total }} result(s)
             </div>
-            <v-pagination
-              :model-value="query.page"
-              :length="pagination.pageCount"
-              :total-visible="7"
-              @update:model-value="onPageChange"
-            />
+            <v-pagination :model-value="query.page" :length="pagination.pageCount" :total-visible="7"
+              @update:model-value="onPageChange" />
           </v-card-actions>
         </v-card>
       </v-col>

@@ -89,18 +89,17 @@ function navigate(to) {
 
       <v-list density="compact" nav>
         <v-list-item v-for="item in topLevelItems" :key="item.title" :prepend-icon="item.icon" :title="item.title"
-          :active="isActiveRoute(item.to.name)" class="shell-nav-item" color="accent" rounded="pill"
-          @click="navigate(item.to)" />
+          :active="isActiveRoute(item.to.name)" class="shell-nav-item" color="accent" @click="navigate(item.to)" />
 
         <v-list-group v-model="reportsOpen" value="reports" class="shell-nav-group">
           <template #activator="{ props }">
             <v-list-item v-bind="props" prepend-icon="mdi-file-chart-outline" title="Reports"
-              :active="route.path.startsWith('/reports')" class="shell-nav-item" color="accent" rounded="pill" />
+              :active="route.path.startsWith('/reports')" class="shell-nav-item" color="accent" />
           </template>
 
           <v-list-item v-for="item in reportItems" :key="item.title" :prepend-icon="item.icon" :title="item.title"
             :active="isActiveRoute(item.to.name)" class="shell-nav-item shell-nav-item--child" color="accent"
-            rounded="pill" @click="navigate(item.to)" />
+            @click="navigate(item.to)" />
         </v-list-group>
       </v-list>
     </v-navigation-drawer>
@@ -222,7 +221,7 @@ function navigate(to) {
   margin: 6px 0 0 12px;
   padding: 6px;
   background: rgba(255, 255, 255, 0.14);
-  border-radius: 24px;
+  border-radius: var(--border-radius);
 }
 
 .shell-nav-group :deep(.v-list-group__items .shell-nav-item) {
@@ -253,20 +252,81 @@ function navigate(to) {
 .shell-nav-group :deep(.v-list-group__items .v-list-item--active),
 .shell-nav-group :deep(.v-list-group__items .v-list-item[aria-current='page']) {
   background: rgba(242, 104, 151, 1);
-  border-radius: 999px;
+  border-radius: var(--border-radius);
 }
 
 /* MainLayout wants the full-row pink highlight. */
 .main-layout-drawer :deep(.v-list-item--active),
 .main-layout-drawer :deep(.v-list-item[aria-current='page']) {
   background: rgba(242, 104, 151, 1);
-  border-radius: 999px;
+  border-radius: var(--border-radius);
 }
 
 .main-layout-drawer :deep(.v-list-item--active .v-icon),
 .main-layout-drawer :deep(.v-list-item[aria-current='page'] .v-icon) {
   background: transparent;
   border-color: rgba(230, 230, 230, 0.67);
+}
+
+/* Compact nav rows: highlight hugs icon + label (rail + expanded). */
+.main-layout-drawer :deep(.v-list--nav) {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-inline: 4px;
+}
+
+.main-layout-drawer.v-navigation-drawer--rail:not(.v-navigation-drawer--is-hovering) :deep(.v-list--nav) {
+  align-items: center;
+}
+
+.main-layout-drawer.v-navigation-drawer--rail:not(.v-navigation-drawer--is-hovering) :deep(.v-list-item__content),
+.main-layout-drawer.v-navigation-drawer--rail:not(.v-navigation-drawer--is-hovering) :deep(.v-list-item-title),
+.main-layout-drawer.v-navigation-drawer--rail:not(.v-navigation-drawer--is-hovering) :deep(.v-list-item-subtitle) {
+  display: none !important;
+}
+
+.main-layout-drawer.v-navigation-drawer--rail:not(.v-navigation-drawer--is-hovering) :deep(.shell-nav-item) {
+  width: 48px;
+  min-width: 48px;
+  justify-content: center;
+  padding-inline: 0 !important;
+  --v-list-prepend-gap: 0;
+}
+
+.main-layout-drawer.v-navigation-drawer--rail:not(.v-navigation-drawer--is-hovering) :deep(.shell-nav-item .v-list-item__prepend) {
+  margin-inline-end: 0 !important;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--border-radius);
+}
+
+.main-layout-drawer.v-navigation-drawer--rail:not(.v-navigation-drawer--is-hovering) :deep(.v-list-item--active),
+.main-layout-drawer.v-navigation-drawer--rail:not(.v-navigation-drawer--is-hovering) :deep(.v-list-item[aria-current='page']) {
+  background: transparent;
+}
+
+.main-layout-drawer.v-navigation-drawer--rail:not(.v-navigation-drawer--is-hovering) :deep(.v-list-item__overlay) {
+  opacity: 0 !important;
+}
+
+.main-layout-drawer.v-navigation-drawer--rail:not(.v-navigation-drawer--is-hovering) :deep(.v-list-item--active .v-list-item__prepend),
+.main-layout-drawer.v-navigation-drawer--rail:not(.v-navigation-drawer--is-hovering) :deep(.v-list-item[aria-current='page'] .v-list-item__prepend) {
+  background: rgba(242, 104, 151, 1);
+}
+
+.main-layout-drawer :deep(.shell-nav-group) {
+  width: fit-content;
+  max-width: 100%;
+}
+
+.main-layout-drawer :deep(.shell-nav-item) {
+  width: fit-content;
+  max-width: 100%;
+  padding-inline: 10px !important;
+  --v-list-prepend-gap: 10px;
 }
 
 .info-card {

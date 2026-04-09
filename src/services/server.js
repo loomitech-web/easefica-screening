@@ -110,7 +110,7 @@ export async function fetchCostReport(aiId, isScreening = true) {
   });
 }
 
-export async function fetchAIFromEaseFica(aiId) {
+export async function fetchAI(aiId) {
   return tryRequest(async (client) => {
     if (!aiId) {
       throw new Error('AI ID is required to fetch AI details.');
@@ -120,6 +120,12 @@ export async function fetchAIFromEaseFica(aiId) {
       '/easefica-screening/auth/auth/getAIFromEaseFica',
       { params: { aiId } },
     );
+    console.log('response', response);
+    if (!response.data) {
+      console.error('Failed to fetch AI details from easefica.', response);
+      throw new Error('Failed to fetch AI details.');
+    }
+
     return response.data;
   });
 }

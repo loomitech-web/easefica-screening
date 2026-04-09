@@ -2,7 +2,7 @@ import { ref } from 'vue';
 import { defineStore, storeToRefs } from 'pinia';
 import { useAuthStore } from './auth';
 import {
-  fetchAIFromEaseFica,
+  fetchAI,
   fetchUserRoleByEmail,
 } from '../services/server';
 
@@ -30,7 +30,7 @@ export const useUserStore = defineStore('user', () => {
     error.value = '';
     try {
       const [ai, userRecord] = await Promise.all([
-        fetchAIFromEaseFica(aiId),
+        fetchAI("1"),
         fetchUserRoleByEmail(email),
       ]);
 

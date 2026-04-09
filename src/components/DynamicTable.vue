@@ -3,13 +3,8 @@
         <div v-if="filterControls" class="dynamic-table-panel__toolbar">
             <v-row class="align-center" compact>
                 <v-col v-if="filterControls.search" cols="12" md="4">
-                    <v-text-field v-model="search" class="dynamic-table-filter" label="Search subjects..."
-                        prepend-inner-icon="mdi-magnify" variant="outlined" hide-details density="compact" />
-                </v-col>
-
-                <v-col v-if="filterControls.dateFilter" cols="12" md="4">
-                    <v-text-field v-model="dateRange" class="dynamic-table-filter" label="Filter by Date" type="date"
-                        variant="outlined" hide-details density="compact" />
+                    <InputField v-model="search" label="Search subjects..." prepend-inner-icon="mdi-magnify"
+                        placeholder="Search subjects..." />
                 </v-col>
 
                 <v-col v-if="filterControls.categoryFilter" cols="12" md="4">
@@ -17,6 +12,12 @@
                         :items="filterControls.categoryFilters" label="Category" variant="outlined" hide-details
                         density="compact" clearable />
                 </v-col>
+
+                <v-col v-if="filterControls.dateFilter" cols="12" md="4">
+                    <DateField v-model="selectedDateRange" label="Filter by Date" />
+                </v-col>
+
+
             </v-row>
         </div>
 
@@ -36,6 +37,8 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import InputField from './fields/InputField.vue'
+import DateField from './fields/DateField.vue'
 
 const props = defineProps({
     headers: { type: Array, required: true },
@@ -77,7 +80,7 @@ function onItemsPerPageChange(value) {
 }
 
 const search = ref('')
-const dateRange = ref(null)
+const selectedDateRange = ref('')
 const selectedCategory = ref(null)
 const pagination = computed(() => ({
     page: props.page,
@@ -111,7 +114,7 @@ const filteredContent = computed(() => {
     background: #fff;
     border: 1px solid #ccc;
     box-shadow: 0px 0px 10px #ccc !important;
-    border-radius: 10px !important;
+    border-radius: var(--border-radius) !important;
     overflow: hidden;
 }
 
@@ -122,7 +125,7 @@ const filteredContent = computed(() => {
 }
 
 .dynamic-table-filter :deep(.v-field) {
-    border-radius: 10px;
+    border-radius: var(--border-radius);
     background: rgba(255, 255, 255, 0.96);
 }
 

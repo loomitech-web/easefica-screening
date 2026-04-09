@@ -58,6 +58,7 @@ const content = computed(() => {
       screenedLists: (screening?.selectedLists || []).join(', '),
       screenedAt: formatScreeningDate(screening?.timestamp),
       totalMatches: screening?.subjectsWithMatches || 0,
+      listsScreenedAgainst: (screening?.selectedLists || []).join(', '),
     }
   })
 
@@ -74,7 +75,7 @@ const content = computed(() => {
 })
 
 const filterControls = {
-  search: false,
+  search: true,
   dateFilter: true,
   categoryFilter: true,
   categoryFilters: ['PEP', 'Sanctions', 'Adverse Media'],
@@ -102,6 +103,12 @@ function onPageSizeChange(nextPageSize) {
   screeningStore.loadHistory({ aiId: aiId.value, page: 1, pageSize: nextPageSize });
 }
 
+function formatScreeningLists() {
+  return (history.value || []).map((screening) => {
+    return screening?.selectedLists || [];
+  }).flat().filter((list, index, self) => self.indexOf(list) === index).join(', ');
+}
+
 </script>
 
 <template>
@@ -116,16 +123,22 @@ function onPageSizeChange(nextPageSize) {
       <PageHeader title="Screening Dashboard" />
 
       <v-row class="dashboard-stats-row">
-        <v-col cols="12" md="6">
+        <v-col cols="12" md="4">
           <div class="stat-card">
             <span class="stat-number">{{ summary.totalNumberOfScreenings }}</span>
             <div class="stat-label">Total screenings</div>
           </div>
         </v-col>
-        <v-col cols="12" md="6">
+        <v-col cols="12" md="4">
           <div class="stat-card">
             <span class="stat-number">{{ formatScreeningDate(lastScreenedAt) }}</span>
             <div class="stat-label">Date last screened</div>
+          </div>
+        </v-col>
+        <v-col cols="12" md="4">
+          <div class="stat-card">
+            <span class="stat-number">{{ formatScreeningLists() }}</span>
+            <div class="stat-label">Lists screened against</div>
           </div>
         </v-col>
       </v-row>

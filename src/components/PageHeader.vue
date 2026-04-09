@@ -46,7 +46,7 @@ defineProps({
   justify-content: left;
   align-items: center;
   border: 1px solid var(--ef-border);
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   padding: 8px;
 }
 
