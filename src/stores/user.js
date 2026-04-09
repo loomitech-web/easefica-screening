@@ -30,7 +30,7 @@ export const useUserStore = defineStore('user', () => {
     error.value = '';
     try {
       const [ai, userRecord] = await Promise.all([
-        fetchAI("1"),
+        fetchAI(aiId),
         fetchUserRoleByEmail(email),
       ]);
 

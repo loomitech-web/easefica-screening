@@ -112,7 +112,7 @@ function formatScreeningLists() {
 </script>
 
 <template>
-  <v-container fluid class="screen-container">
+  <v-container fluid class="screen-container dashboard-container">
     <div class="screen">
       <!-- <div class="page-icon-container">
         <img v-if="iconSrc" :src="iconSrc" alt="" class="page-icon-image">
@@ -155,6 +155,10 @@ function formatScreeningLists() {
 </template>
 
 <style scoped>
+.dashboard-container {
+  padding-inline-start: 12px;
+}
+
 .screen {
   width: min(100%, 1240px);
   padding: 20px;
@@ -206,6 +210,10 @@ function formatScreeningLists() {
 }
 
 @media (max-width: 600px) {
+  .dashboard-container {
+    padding-inline-start: 0;
+  }
+
   .screen {
     padding: 12px;
   }

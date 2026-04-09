@@ -35,7 +35,7 @@ const reportItems = [
 const userDisplayName = computed(
   () => profile.value?.nickname || profile.value?.email || 'Authenticated User',
 );
-
+console.log("profile: ", JSON.stringify(profile.value, null, 2));
 const companyDisplay = computed(() => profile.value?.company || 'Easefica Screening');
 const roleDisplay = computed(() => profile.value?.role || 'Screening Analyst');
 const showBusy = computed(() => screeningStore.isLoading || reportsStore.isLoading);
@@ -199,6 +199,7 @@ function navigate(to) {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  color: #0a7cb9;
   z-index: 1000;
 }
 
