@@ -232,3 +232,65 @@ export async function downloadLastUploadedDataSubjects(aiId) {
     return { blob, filename };
   });
 }
+
+/**
+ * Parse Excel of data subjects. Returns validation rows, duplicate rows, fileId for Redis staging, etc.
+ */
+export async function uploadDataSubjectsExcel(file) {
+  if (!file || !(file instanceof Blob)) {
+    throw new Error('Please choose an Excel file to upload.');
+  }
+  const formData = new FormData();
+  formData.append('file', file);
+  return tryRequest(async (client) => {
+    const response = await client.post('/easefica-screening/screening/screening/uploadDataSubjects', formData, {
+      timeout: 300000,
+    });
+    return response.data;
+  });
+}
+
+export async function downloadDuplicateRowsReport(fileId) {
+  if (!fileId) {
+    throw new Error('File ID is required to download the duplicate report.');
+  }
+  return tryRequest(async (client) => {
+    const response = await client.get('/easefica-screening/screening/screening/downloadDuplicateReport', {
+      params: { fileId },
+      responseType: 'blob',
+      timeout: 60000,
+    });
+    const blob = response.data;
+    const filename =
+      filenameFromContentDisposition(response.headers['content-disposition']) ||
+      `duplicate_rows_${fileId}.txt`;
+    return { blob, filename };
+  });
+}
+
+/**
+ * Paged list of subjects staged in Redis after an Excel upload (deduplicated order).
+ */
+export async function fetchStagedDataSubjects(params = {}) {
+  if (!params.fileId) {
+    throw new Error('File ID is required to load staged upload.');
+  }
+  const page = Math.max(1, Number(params.page || 1));
+  const pageSize = Math.max(1, Number(params.pageSize || 10));
+  return tryRequest(async (client) => {
+    const response = await client.get('/easefica-screening/screening/screening/getPagedDataSubjects', {
+      params: {
+        fileId: params.fileId,
+        page,
+        pageSize,
+      },
+      timeout: 60000,
+    });
+    const body = response.data || {};
+    return {
+      items: Array.isArray(body.dataSubjects) ? body.dataSubjects : [],
+      totalCount: Number(body.totalCount) || 0,
+      metadata: body.metadata || null,
+    };
+  });
+}

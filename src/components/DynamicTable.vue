@@ -22,7 +22,8 @@
 
                 <v-col v-if="filterControls.manageDataSubjects" cols="12" md="auto"
                     class="dynamic-table-panel__filter-col">
-                    <FileUpload v-model="file" label="Upload file" />
+                    <FileUpload :key="fileInputKey" v-model="uploadFileModel" label="Upload file" accept=".xlsx,.xls"
+                        :loading="uploadLoading" @change="onUploadFileChange" />
                 </v-col>
 
                 <v-col v-if="filterControls.manageDataSubjects" cols="12" md="auto"
@@ -35,7 +36,7 @@
         </div>
 
         <v-data-table-server :headers="headers" :items="filteredContent" :search="search" class="dynamic-table" hover
-            :items-per-page="pageSize" :page="page" :items-per-page-text="`Items per page`"
+            :loading="loading" :items-per-page="pageSize" :page="page" :items-per-page-text="`Items per page`"
             :page-text="`Page ${page} of ${pagination.pageCount}`" :items-length="totalCount"
             :items-per-page-options="[10, 25, 50, 100]" @update:page="onPageChange"
             @update:items-per-page="onItemsPerPageChange">
@@ -56,6 +57,8 @@ import BaseSelect from './fields/BaseSelect.vue'
 import DateRangeField from './fields/DateRangeField.vue'
 import FileUpload from './fields/FileUpload.vue'
 
+const emit = defineEmits(['update:page', 'update:pageSize', 'update:dateRange', 'download', 'file-selected'])
+
 const props = defineProps({
     headers: { type: Array, required: true },
     content: { type: Array, required: true },
@@ -74,9 +77,27 @@ const props = defineProps({
     totalCount: { type: Number, required: true },
     page: { type: Number, required: true },
     pageSize: { type: Number, required: true },
+    fileInputKey: { type: Number, default: 0 },
+    uploadLoading: { type: Boolean, default: false },
+    loading: { type: Boolean, default: false },
 })
 
-const emit = defineEmits(['update:page', 'update:pageSize', 'update:dateRange'])
+const uploadFileModel = ref([])
+
+function pickFile(raw) {
+    if (raw == null) return null
+    if (Array.isArray(raw)) return raw[0] ?? null
+    return raw
+}
+
+function onUploadFileChange(value) {
+    const f = pickFile(value)
+    if (f) emit('file-selected', f)
+}
+
+function downloadPreviousUpload() {
+    emit('download')
+}
 
 function onPageChange(value) {
     console.log('DynamicTable | page changed', {
